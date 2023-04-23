@@ -6,6 +6,7 @@ dotenv.config();
 const authRoute = require("./routes").auth;
 const courseRoute = require("./routes").course;
 const passport = require("passport");
+const cors = require("cors");
 require("./config/passport")(passport);
 
 // connect to MongoDB
@@ -21,6 +22,7 @@ mongoose
 // middleWares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 app.use("/api/user", authRoute);
 

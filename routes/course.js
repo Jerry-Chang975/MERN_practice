@@ -36,6 +36,50 @@ router.get("/:_id", async (req, res) => {
   }
 });
 
+// get course by instructor id
+router.get("/instructor/:_instructor_id", async (req, res) => {
+  let { _instructor_id } = req.params;
+  let coursesFound = await Course.find({
+    instructor: _instructor_id,
+  })
+    .populate("instructor", ["username", "email"])
+    .exec();
+  return res.send(coursesFound);
+});
+
+// get course by student id
+router.get("/student/:_student_id", async (req, res) => {
+  let { _student_id } = req.params;
+  let courseFound = await Course.find({ students: _student_id })
+    .populate("instructor", ["username", "email"])
+    .exec();
+  return res.send(courseFound);
+});
+
+// get course by name
+router.get("/search/:_course_name", async (req, res) => {
+  let { _course_name } = req.params;
+  let coursesFound = await Course.find({ title: _course_name })
+    .populate("instructor", ["username", "email"])
+    .exec();
+  return res.send(coursesFound);
+});
+
+// student enrolls course by id
+router.post("/enroll/:_id", async (req, res) => {
+  let { _id } = req.params;
+  try {
+    let courseFound = await Course.findOne({ _id });
+    courseFound.students.push(req.user._id);
+    let result = await courseFound.save();
+    return res.send(result);
+  } catch (e) {
+    return res.send(e);
+  }
+
+  return;
+});
+
 // post new course
 router.post("/", async (req, res) => {
   let { error } = courseValidation(req.body);
